@@ -185,7 +185,7 @@ src/
 prisma/
   schema.prisma           tables + enums (users, courses, modules, sections, ...,
                           filieres)
-  migrations/             migration initiale + ajout de la table filieres
+  migrations/             init + table filieres + champs name/headline/timeline du profil
   seed.ts / seed-data.ts  données de démonstration (issues du prototype)
 requests.http             une requête de test par endpoint
 ```
@@ -194,6 +194,21 @@ requests.http             une requête de test par endpoint
 
 Liste complète et à jour dans [`architecture-technique.md`](./architecture-technique.md) §3.
 Toutes les routes sont préfixées par `/api` (configurable via `API_PREFIX`).
+
+**Détails d'intégration frontend :**
+
+- `POST /auth/login` et `/auth/register` renvoient `token` (et `accessToken`, même
+  valeur) + `user`.
+- `GET /courses/:id/modules` renvoie **la liste ordonnée des modules** (tableau) ;
+  authentification **facultative** : si un token valide est fourni, chaque section
+  porte `completed` et chaque module un `status` (`done` / `current` / `locked`)
+  calculés à la volée.
+- `GET /users/me/courses` : `progress` est un objet
+  `{ completedSections, totalSections, percentage }`.
+- `POST /mentoring/bookings` : `scheduledAt` est **facultatif** — le prochain
+  créneau libre est attribué automatiquement s'il est absent.
+- `GET /profile` renvoie `{ profile, skills, works }` ; `profile` inclut
+  `name`, `headline`, `timeline`.
 
 ---
 

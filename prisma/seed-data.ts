@@ -224,9 +224,33 @@ export const FILIERE_INFO: SeedFiliere[] = [
 ];
 
 export const PROFILE = {
+  name: 'Meredian',
+  headline:
+    'Étudiant en génie informatique, formateur en Histoire, Droit, Informatique et RH.',
   bio: "Étudiant en génie informatique et passionné de transmission. Je conçois Meredian pour partager ce que j'apprends en histoire, droit, informatique et RH — et pour accompagner celles et ceux qui veulent progresser.",
   cvUrl: 'https://meredian.io/cv.pdf',
   pitchVideoUrl: 'https://meredian.io/pitch.mp4',
   location: 'Zurich, Suisse',
   emailContact: 'contact@meredian.io',
+  // Constante TIMELINE du prototype frontend.
+  timeline: [
+    {
+      year: '2024 — présent',
+      type: 'formation',
+      title: 'Licence 2, Génie Informatique',
+      place: 'Université de Zurich',
+    },
+    {
+      year: '2023',
+      type: 'experience',
+      title: 'Stage — Développement web',
+      place: 'Cabinet indépendant',
+    },
+    {
+      year: '2022',
+      type: 'formation',
+      title: 'Baccalauréat, série Sciences',
+      place: 'Lycée',
+    },
+  ],
 };

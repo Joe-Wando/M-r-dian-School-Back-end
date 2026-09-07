@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -26,11 +27,15 @@ export class ProfileService {
 
   /** Met à jour l'unique ligne de profil (la crée si elle n'existe pas). */
   async updateProfile(dto: UpdateProfileDto) {
+    const data = {
+      ...dto,
+      timeline: dto.timeline as Prisma.InputJsonValue | undefined,
+    };
     const existing = await this.prisma.profile.findFirst();
     if (!existing) {
-      return this.prisma.profile.create({ data: { ...dto } });
+      return this.prisma.profile.create({ data });
     }
-    return this.prisma.profile.update({ where: { id: existing.id }, data: { ...dto } });
+    return this.prisma.profile.update({ where: { id: existing.id }, data });
   }
 
   addSkill(dto: CreateSkillDto) {

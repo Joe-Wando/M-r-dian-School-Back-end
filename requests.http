@@ -60,8 +60,11 @@ GET {{baseUrl}}/courses?category=Informatique&level=Formation Pro&query=react
 ### Détail d'un cours (remplacer :id par un UUID réel)
 GET {{baseUrl}}/courses/00000000-0000-0000-0000-000000000000
 
-### Structure complète (modules + sections)
+### Structure complète (liste ordonnée de modules + sections)
+### Auth facultative : avec un token valide, chaque section porte `completed`
+### et chaque module un `status` (done / current / locked).
 GET {{baseUrl}}/courses/00000000-0000-0000-0000-000000000000/modules
+Authorization: Bearer {{token}}
 
 ### Filières — contenu des bandeaux du catalogue (les 4)
 GET {{baseUrl}}/filieres

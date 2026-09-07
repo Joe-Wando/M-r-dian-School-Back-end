@@ -3,6 +3,7 @@
  * Le prix est déterminé côté serveur à partir de la durée choisie.
  */
 export interface MentoringOption {
+  id: string;
   durationMinutes: 30 | 60;
   label: string;
   description: string;
@@ -11,12 +12,14 @@ export interface MentoringOption {
 
 export const MENTORING_OPTIONS: MentoringOption[] = [
   {
+    id: 'MEN-30',
     durationMinutes: 30,
     label: '30 min',
     description: 'Une question précise, un blocage à débloquer rapidement.',
     price: 8000,
   },
   {
+    id: 'MEN-60',
     durationMinutes: 60,
     label: '60 min',
     description: 'Un accompagnement approfondi : projet, orientation, plan de progression.',

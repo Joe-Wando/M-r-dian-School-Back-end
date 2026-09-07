@@ -297,11 +297,14 @@ model WorkSubmission {
 
 model Profile {
   id            String @id @default(uuid()) @db.Uuid
+  name          String @default("")
+  headline      String @default("")
   bio           String @default("")
   cvUrl         String @default("") @map("cv_url")
   pitchVideoUrl String @default("") @map("pitch_video_url")
   location      String @default("")
   emailContact  String @default("") @map("email_contact")
+  timeline      Json   @default("[]") // [{ year, type: "formation"|"experience", title, place }]
 
   @@map("profile")
 }

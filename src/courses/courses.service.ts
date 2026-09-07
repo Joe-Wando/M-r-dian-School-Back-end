@@ -45,7 +45,18 @@ export class CoursesService {
   }
 
   /** Structure complète : modules + sections + sous-ressources, triées. */
-  async findModules(courseId: string) {
+  /**
+   * Structure complète d'un cours : liste ordonnée de modules, chacun avec ses
+   * sections et sous-ressources.
+   *
+   * Si `userId` est fourni, chaque section porte `completed` et chaque module un
+   * `status` (`done` / `current` / `locked`) calculé à la volée à partir des
+   * sections déjà complétées :
+   *   - `done`    : toutes les sections du module sont complétées
+   *   - `current` : premier module non entièrement complété
+   *   - `locked`  : modules situés après le module courant
+   */
+  async findModules(courseId: string, userId?: string) {
     const course = await this.prisma.course.findUnique({
       where: { id: courseId },
       include: {
@@ -65,37 +76,53 @@ export class CoursesService {
     });
     if (!course) throw new NotFoundException('Cours introuvable.');
 
-    return {
-      courseId: course.id,
-      code: course.code,
-      title: course.title,
-      modules: course.modules.map((m) => ({
-        id: m.id,
-        title: m.title,
-        orderIndex: m.orderIndex,
-        sections: m.sections.map((s) => ({
-          id: s.id,
-          title: s.title,
-          type: s.type,
-          orderIndex: s.orderIndex,
-          duration: s.duration,
-          practical: s.practical,
-          body: s.type === 'reading' ? s.body : null,
-          videoUrl: s.type === 'video' ? s.videoUrl : null,
-          photos: s.type === 'image' ? s.photos : [],
-          quiz:
-            s.type === 'quiz'
-              ? s.quiz.map((q) => ({
-                  id: q.id,
-                  question: q.question,
-                  options: q.options,
-                  correctIndex: q.correctIndex,
-                  orderIndex: q.orderIndex,
-                }))
-              : [],
-        })),
-      })),
-    };
+    const completedSectionIds = new Set<string>();
+    if (userId) {
+      const rows = await this.prisma.sectionCompletion.findMany({
+        where: { userId, section: { module: { courseId } } },
+        select: { sectionId: true },
+      });
+      rows.forEach((r) => completedSectionIds.add(r.sectionId));
+    }
+
+    let currentAssigned = false;
+    return course.modules.map((m) => {
+      const sections = m.sections.map((s) => ({
+        id: s.id,
+        title: s.title,
+        type: s.type,
+        orderIndex: s.orderIndex,
+        duration: s.duration,
+        practical: s.practical,
+        completed: completedSectionIds.has(s.id),
+        body: s.type === 'reading' ? s.body : null,
+        videoUrl: s.type === 'video' ? s.videoUrl : null,
+        photos: s.type === 'image' ? s.photos : [],
+        quiz:
+          s.type === 'quiz'
+            ? s.quiz.map((q) => ({
+                id: q.id,
+                question: q.question,
+                options: q.options,
+                correctIndex: q.correctIndex,
+                orderIndex: q.orderIndex,
+              }))
+            : [],
+      }));
+
+      const allDone = sections.length > 0 && sections.every((s) => s.completed);
+      let status: 'done' | 'current' | 'locked';
+      if (allDone) {
+        status = 'done';
+      } else if (!currentAssigned) {
+        status = 'current';
+        currentAssigned = true;
+      } else {
+        status = 'locked';
+      }
+
+      return { id: m.id, title: m.title, orderIndex: m.orderIndex, status, sections };
+    });
   }
 
   async create(dto: CreateCourseDto) {
