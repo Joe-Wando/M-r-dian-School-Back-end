@@ -334,3 +334,20 @@ model ContactMessage {
 
   @@map("contact_messages")
 }
+
+// ------------------------------------------------------------------
+// 2.7 Filières (contenu éditorial des bandeaux du catalogue)
+// ------------------------------------------------------------------
+
+model Filiere {
+  id                String         @id @default(uuid()) @db.Uuid
+  category          CourseCategory @unique
+  intro             String         @default("")
+  videoUrl          String?        @map("video_url")
+  levels            Json           @default("{}") // { "L1": "...", "L2": "...", ... }
+  certificationText String?        @map("certification_text")
+  certificationUrl  String?        @map("certification_url")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  @@map("filieres")
+}

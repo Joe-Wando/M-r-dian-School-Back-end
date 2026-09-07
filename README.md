@@ -86,7 +86,8 @@ Le seed est **idempotent** (upserts) et crée :
   statut gratuit/payant), dont deux cours entièrement détaillés en modules/sections
   (`HIS-101`, `INF-105`),
 - le profil de vitrine, les compétences et les réalisations,
-- trois sessions Q&R planifiées dans les deux prochaines semaines.
+- trois sessions Q&R planifiées dans les deux prochaines semaines,
+- les 4 filières (contenu des bandeaux du catalogue, constante `FILIERE_INFO`).
 
 > **Note** : le prompt mentionnait « 28 cours » ; la constante `COURSES` du
 > prototype en contient en réalité **34**. Le seed reprend la liste exacte du
@@ -170,6 +171,7 @@ src/
   auth/                   register / login / me, JwtStrategy, JwtAuthGuard
   users/                  GET /users/me/courses
   courses/               catalogue public + CRUD admin
+  filieres/              contenu éditorial des bandeaux du catalogue (public + PATCH admin)
   modules/               modules de cours (CRUD admin)
   sections/              sections de cours (CRUD admin, contenu selon le type)
   enrollments/           progression : enroll, complete, calcul du %
@@ -181,7 +183,9 @@ src/
   contact/               formulaire de contact
   admin/                 statistiques + messages de contact
 prisma/
-  schema.prisma           14 tables + enums
+  schema.prisma           tables + enums (users, courses, modules, sections, ...,
+                          filieres)
+  migrations/             migration initiale + ajout de la table filieres
   seed.ts / seed-data.ts  données de démonstration (issues du prototype)
 requests.http             une requête de test par endpoint
 ```

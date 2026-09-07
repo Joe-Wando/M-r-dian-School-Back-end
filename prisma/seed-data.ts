@@ -168,6 +168,61 @@ export const QA_SESSIONS = [
   { topic: 'Orientation carrière en informatique', inDays: 16, hourUtc: 10, durationMinutes: 60, maxSpots: 20 },
 ];
 
+// Constante FILIERE_INFO du prototype — contenu éditorial des bandeaux du catalogue.
+export interface SeedFiliere {
+  category: SeedCategory;
+  intro: string;
+  levels: Record<string, string>;
+  certificationText?: string;
+  certificationUrl?: string;
+}
+
+export const FILIERE_INFO: SeedFiliere[] = [
+  {
+    category: 'Histoire',
+    intro:
+      "Vous voici plongés dans l'étude du temps long : comprendre le présent à la lumière du passé.",
+    levels: {
+      L1: 'Poser les bases : repères chronologiques et méthode historique.',
+      L2: 'Approfondir : civilisations, institutions et sociétés à travers les âges.',
+      L3: "Analyser des enjeux contemporains à la lumière de l'histoire récente.",
+    },
+  },
+  {
+    category: 'Droit',
+    intro:
+      'Vos premiers pas dans le raisonnement juridique : rigueur, logique, argumentation.',
+    levels: {
+      L1: 'Les fondations du droit : sources, institutions, vocabulaire juridique.',
+      L2: 'Le cœur de la matière : droit public et droit privé approfondis.',
+      L3: 'Spécialisation : droit appliqué à des situations professionnelles concrètes.',
+    },
+  },
+  {
+    category: 'Informatique',
+    intro:
+      "Vous voici en train de faire vos premiers pas en informatique. Prenez le temps d'apprendre les bases : elles vous serviront toute votre carrière.",
+    levels: {
+      L1: 'Les fondamentaux : algorithmique et premiers langages de programmation.',
+      L2: 'Structurer sa pensée : structures de données, bases de données, programmation orientée objet.',
+      L3: 'Se spécialiser : data, analyse, projets concrets.',
+      'Formation Pro':
+        'Des compétences directement applicables en entreprise : outils, frameworks, bonnes pratiques.',
+    },
+    certificationText:
+      "Cette filière peut t'orienter vers une certification professionnelle externe reconnue.",
+  },
+  {
+    category: 'RH',
+    intro:
+      'Des compétences RH concrètes, pensées pour le terrain : recrutement, paie, gestion des équipes.',
+    levels: {
+      'Formation Pro':
+        'Des modules pratiques, indépendants les uns des autres, à suivre selon tes besoins du moment.',
+    },
+  },
+];
+
 export const PROFILE = {
   bio: "Étudiant en génie informatique et passionné de transmission. Je conçois Meredian pour partager ce que j'apprends en histoire, droit, informatique et RH — et pour accompagner celles et ceux qui veulent progresser.",
   cvUrl: 'https://meredian.io/cv.pdf',

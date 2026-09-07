@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 
 import {
   COURSES,
+  FILIERE_INFO,
   MODULES_BY_COURSE,
   PROFILE,
   QA_SESSIONS,
@@ -204,12 +205,35 @@ async function seedQaSessions(): Promise<void> {
   console.log(`  ✓ ${QA_SESSIONS.length} sessions Q&R`);
 }
 
+async function seedFilieres(): Promise<void> {
+  for (const f of FILIERE_INFO) {
+    await prisma.filiere.upsert({
+      where: { category: f.category },
+      update: {
+        intro: f.intro,
+        levels: f.levels,
+        certificationText: f.certificationText ?? null,
+        certificationUrl: f.certificationUrl ?? null,
+      },
+      create: {
+        category: f.category,
+        intro: f.intro,
+        levels: f.levels,
+        certificationText: f.certificationText ?? null,
+        certificationUrl: f.certificationUrl ?? null,
+      },
+    });
+  }
+  console.log(`  ✓ ${FILIERE_INFO.length} filières (contenu des bandeaux)`);
+}
+
 async function main(): Promise<void> {
   console.log('Seed Meredian —');
   await seedAdmin();
   await seedCourses();
   await seedVitrine();
   await seedQaSessions();
+  await seedFilieres();
   console.log('Seed terminé.');
 }
 
