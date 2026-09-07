@@ -57,9 +57,10 @@ export default (): AppConfig => {
       ).toLowerCase(),
     },
     seed: {
-      adminEmail: process.env.SEED_ADMIN_EMAIL ?? 'admin@meredian.io',
-      adminPassword: process.env.SEED_ADMIN_PASSWORD ?? 'ChangeMe!2026',
-      adminName: process.env.SEED_ADMIN_NAME ?? 'Admin Meredian',
+      adminEmail: process.env.ADMIN_EMAIL ?? 'admin@meredian.io',
+      // Jamais de valeur par défaut : le seed exige un ADMIN_PASSWORD explicite.
+      adminPassword: process.env.ADMIN_PASSWORD ?? '',
+      adminName: process.env.ADMIN_NAME ?? 'Admin Meredian',
     },
   };
 };
