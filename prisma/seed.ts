@@ -38,9 +38,17 @@ function futureDate(inDays: number, hourUtc: number): Date {
 }
 
 async function seedAdmin(): Promise<void> {
-  const email = (process.env.SEED_ADMIN_EMAIL ?? 'admin@meredian.io').toLowerCase();
-  const password = process.env.SEED_ADMIN_PASSWORD ?? 'ChangeMe!2026';
-  const name = process.env.SEED_ADMIN_NAME ?? 'Admin Meredian';
+  const email = (process.env.ADMIN_EMAIL ?? 'admin@meredian.io').toLowerCase();
+  const password = process.env.ADMIN_PASSWORD;
+  const name = process.env.ADMIN_NAME ?? 'Admin Meredian';
+
+  if (!password || password.length < 12) {
+    throw new Error(
+      'ADMIN_PASSWORD est absent ou trop court. Renseignez un mot de passe fort ' +
+        '(>= 12 caractères) dans le fichier .env avant de lancer le seed.',
+    );
+  }
+
   const passwordHash = await bcrypt.hash(password, 12);
 
   await prisma.user.upsert({

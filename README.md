@@ -54,7 +54,8 @@ Toutes les variables sont listées dans [`.env.example`](./.env.example). Le fic
 | `NABOOPAY_API_URL` / `NABOOPAY_API_KEY` | Intégration Naboopay (repoussée) | — |
 | `NABOOPAY_WEBHOOK_SECRET` | Secret HMAC de vérification du webhook | ✅ en production |
 | `NABOOPAY_WEBHOOK_SIGNATURE_HEADER` | Nom du header portant la signature (défaut `x-naboopay-signature`) | — |
-| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` / `SEED_ADMIN_NAME` | Compte admin créé par le seed | — |
+| `ADMIN_EMAIL` / `ADMIN_NAME` | Compte admin créé par le seed | — |
+| `ADMIN_PASSWORD` | Mot de passe du compte admin — **aucune valeur par défaut** : le seed échoue s'il est absent ou < 12 caractères | ✅ pour `npm run seed` |
 
 L'application **valide ces variables au démarrage** et refuse de démarrer si une
 variable critique manque (voir `src/config/env.validation.ts`).
@@ -79,7 +80,8 @@ npm run db:reset
 
 Le seed est **idempotent** (upserts) et crée :
 
-- un compte **admin** (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`),
+- un compte **admin** (`ADMIN_EMAIL` / `ADMIN_PASSWORD`, à définir dans `.env` —
+  aucun mot de passe par défaut),
 - un compte utilisateur de démo (`etudiant@meredian.io` / `Etudiant!2026`),
 - l'ensemble des cours de la constante `COURSES` du prototype frontend
   (Histoire / Droit / Informatique / RH, niveaux L1–L3 + Formation Pro, prix et
