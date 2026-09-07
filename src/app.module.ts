@@ -7,11 +7,14 @@ import { validateEnv } from './config/env.validation';
 import { CoursesModule } from './courses/courses.module';
 import { EnrollmentsModule } from './enrollments/enrollments.module';
 import { HealthController } from './health.controller';
+import { MentoringModule } from './mentoring/mentoring.module';
 import { CourseModulesModule } from './modules/course-modules.module';
 import { PaymentsModule } from './payments/payments.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { QaSessionsModule } from './qa-sessions/qa-sessions.module';
 import { SectionsModule } from './sections/sections.module';
 import { UsersModule } from './users/users.module';
+import { WorkSubmissionsModule } from './work-submissions/work-submissions.module';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { UsersModule } from './users/users.module';
     EnrollmentsModule,
     UsersModule,
     PaymentsModule,
+    MentoringModule,
+    QaSessionsModule,
+    WorkSubmissionsModule,
     // Les modules de domaine sont enregistrés au fil des fonctionnalités.
   ],
   controllers: [HealthController],
