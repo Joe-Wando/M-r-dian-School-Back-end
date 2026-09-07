@@ -8,6 +8,7 @@ import { CoursesModule } from './courses/courses.module';
 import { EnrollmentsModule } from './enrollments/enrollments.module';
 import { HealthController } from './health.controller';
 import { CourseModulesModule } from './modules/course-modules.module';
+import { PaymentsModule } from './payments/payments.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { SectionsModule } from './sections/sections.module';
 import { UsersModule } from './users/users.module';
@@ -27,6 +28,7 @@ import { UsersModule } from './users/users.module';
     SectionsModule,
     EnrollmentsModule,
     UsersModule,
+    PaymentsModule,
     // Les modules de domaine sont enregistrés au fil des fonctionnalités.
   ],
   controllers: [HealthController],
