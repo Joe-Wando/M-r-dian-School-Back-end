@@ -16,6 +16,8 @@ import { RegisterDto } from './dto/register.dto';
 const BCRYPT_ROUNDS = 12;
 
 export interface AuthResult {
+  /** Alias de `accessToken` — attendu tel quel par le frontend. */
+  token: string;
   accessToken: string;
   user: PublicUser;
 }
@@ -78,7 +80,7 @@ export class AuthService {
       secret: this.config.get<string>('jwt.secret'),
       expiresIn: this.config.get<string>('jwt.expiresIn'),
     });
-    return { accessToken, user: this.toPublicUser(user) };
+    return { token: accessToken, accessToken, user: this.toPublicUser(user) };
   }
 
   private toPublicUser(user: User): PublicUser {

@@ -1,6 +1,16 @@
-import { IsEmail, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsArray, IsEmail, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class UpdateProfileDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(160)
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(300)
+  headline?: string;
+
   @IsOptional()
   @IsString()
   @MaxLength(5000)
@@ -25,4 +35,9 @@ export class UpdateProfileDto {
   @IsEmail()
   @MaxLength(180)
   emailContact?: string;
+
+  /** [{ year, type: "formation" | "experience", title, place }] */
+  @IsOptional()
+  @IsArray()
+  timeline?: Array<Record<string, unknown>>;
 }

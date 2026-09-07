@@ -11,8 +11,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
+import {
+  AuthenticatedUser,
+  CurrentUser,
+} from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../common/guards/optional-jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -36,8 +41,12 @@ export class CoursesController {
   }
 
   @Get(':id/modules')
-  findModules(@Param('id', ParseUUIDPipe) id: string) {
-    return this.coursesService.findModules(id);
+  @UseGuards(OptionalJwtAuthGuard)
+  findModules(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user?: AuthenticatedUser,
+  ) {
+    return this.coursesService.findModules(id, user?.id);
   }
 
   // --- Gestion admin (rôle vérifié côté serveur) ---
