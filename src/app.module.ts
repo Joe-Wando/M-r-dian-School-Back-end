@@ -8,6 +8,7 @@ import { validateEnv } from './config/env.validation';
 import { ContactModule } from './contact/contact.module';
 import { CoursesModule } from './courses/courses.module';
 import { EnrollmentsModule } from './enrollments/enrollments.module';
+import { FilieresModule } from './filieres/filieres.module';
 import { HealthController } from './health.controller';
 import { MentoringModule } from './mentoring/mentoring.module';
 import { CourseModulesModule } from './modules/course-modules.module';
@@ -30,6 +31,7 @@ import { WorkSubmissionsModule } from './work-submissions/work-submissions.modul
     PrismaModule,
     AuthModule,
     CoursesModule,
+    FilieresModule,
     CourseModulesModule,
     SectionsModule,
     EnrollmentsModule,

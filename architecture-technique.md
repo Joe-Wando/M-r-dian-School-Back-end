@@ -206,6 +206,20 @@
 | is_read | boolean | |
 | created_at | timestamp | |
 
+### 2.7 Filières (contenu des bandeaux du catalogue)
+
+**`filieres`**
+| Champ | Type | Description |
+|---|---|---|
+| id | uuid | |
+| category | enum(`Histoire`,`Droit`,`Informatique`,`RH`) (unique) | |
+| intro | text | Texte d'introduction affiché dans le bandeau du catalogue |
+| video_url | text (nullable) | Vidéo de présentation de la filière |
+| levels | jsonb | Ex : `{"L1": "...", "L2": "...", "L3": "...", "Formation Pro": "..."}` |
+| certification_text | text (nullable) | Ex : orientation vers une certification externe |
+| certification_url | text (nullable) | |
+| updated_at | timestamp | |
+
 ---
 
 ## 3. API — Liste des endpoints
@@ -219,6 +233,11 @@
 - `GET /courses` — filtres `?category=&level=&query=`
 - `GET /courses/:id`
 - `GET /courses/:id/modules` — structure complète avec sections
+- `GET /filieres` — contenu des bandeaux par matière (intro, vidéo, niveaux, certification)
+- `GET /filieres/:category`
+
+### Filières (admin uniquement)
+- `PATCH /filieres/:category`
 
 ### Cours (admin uniquement — protégé par middleware de rôle)
 - `POST /courses`

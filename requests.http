@@ -63,6 +63,32 @@ GET {{baseUrl}}/courses/00000000-0000-0000-0000-000000000000
 ### Structure complète (modules + sections)
 GET {{baseUrl}}/courses/00000000-0000-0000-0000-000000000000/modules
 
+### Filières — contenu des bandeaux du catalogue (les 4)
+GET {{baseUrl}}/filieres
+
+### Une filière
+GET {{baseUrl}}/filieres/Informatique
+
+# ------------------------------------------------------------------
+# Filières (admin)
+# ------------------------------------------------------------------
+### Éditer le contenu d'une filière
+PATCH {{baseUrl}}/filieres/Histoire
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "intro": "Vous voici plongés dans l'étude du temps long.",
+  "videoUrl": "https://stream.meredian.io/filieres/histoire.m3u8",
+  "levels": {
+    "L1": "Poser les bases : repères chronologiques et méthode historique.",
+    "L2": "Approfondir : civilisations, institutions et sociétés.",
+    "L3": "Analyser des enjeux contemporains à la lumière de l'histoire récente."
+  },
+  "certificationText": null,
+  "certificationUrl": null
+}
+
 # ------------------------------------------------------------------
 # Gestion des cours (admin)
 # ------------------------------------------------------------------
