@@ -1,0 +1,305 @@
+### Meredian backend — collection de requêtes de test
+### À utiliser avec l'extension VS Code "REST Client" (humao.rest-client).
+### Exécute d'abord "login admin" ou "register", copie l'accessToken renvoyé
+### dans la variable @token ci-dessous.
+
+@baseUrl = http://localhost:4000/api
+@token = colle-ici-un-access-token
+@adminEmail = admin@meredian.io
+@adminPassword = ChangeMe!2026
+
+# ------------------------------------------------------------------
+# Santé
+# ------------------------------------------------------------------
+GET {{baseUrl}}/health
+
+# ------------------------------------------------------------------
+# Authentification
+# ------------------------------------------------------------------
+### Inscription
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Awa Ndiaye",
+  "email": "awa@example.com",
+  "password": "MotDePasse!2026"
+}
+
+### Connexion (utilisateur)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "awa@example.com",
+  "password": "MotDePasse!2026"
+}
+
+### Connexion admin (compte créé par le seed)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+### Profil de l'utilisateur connecté
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+# ------------------------------------------------------------------
+# Catalogue public
+# ------------------------------------------------------------------
+### Tous les cours
+GET {{baseUrl}}/courses
+
+### Filtres
+GET {{baseUrl}}/courses?category=Informatique&level=Formation Pro&query=react
+
+### Détail d'un cours (remplacer :id par un UUID réel)
+GET {{baseUrl}}/courses/00000000-0000-0000-0000-000000000000
+
+### Structure complète (modules + sections)
+GET {{baseUrl}}/courses/00000000-0000-0000-0000-000000000000/modules
+
+# ------------------------------------------------------------------
+# Gestion des cours (admin)
+# ------------------------------------------------------------------
+### Créer un cours
+POST {{baseUrl}}/courses
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "code": "INF-401",
+  "title": "Architecture logicielle",
+  "category": "Informatique",
+  "level": "L3",
+  "template": "Mixte",
+  "price": 20000,
+  "duration": "8h",
+  "description": "Patrons d'architecture, modularité, dette technique."
+}
+
+### Modifier un cours
+PATCH {{baseUrl}}/courses/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "price": 18000, "isFree": false }
+
+### Supprimer un cours
+DELETE {{baseUrl}}/courses/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+### Ajouter un module
+POST {{baseUrl}}/courses/00000000-0000-0000-0000-000000000000/modules
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "title": "Introduction", "orderIndex": 0 }
+
+### Modifier un module
+PATCH {{baseUrl}}/modules/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "title": "Introduction générale" }
+
+### Supprimer un module
+DELETE {{baseUrl}}/modules/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+### Ajouter une section — lecture
+POST {{baseUrl}}/modules/00000000-0000-0000-0000-000000000000/sections
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Pourquoi l'architecture compte",
+  "type": "reading",
+  "duration": "8 min",
+  "body": "# Introduction\n\nTexte enrichi en markdown..."
+}
+
+### Ajouter une section — vidéo
+POST {{baseUrl}}/modules/00000000-0000-0000-0000-000000000000/sections
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Démo en direct",
+  "type": "video",
+  "practical": true,
+  "duration": "18 min",
+  "videoUrl": "https://stream.example.com/abc.m3u8"
+}
+
+### Ajouter une section — images
+POST {{baseUrl}}/modules/00000000-0000-0000-0000-000000000000/sections
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Galerie",
+  "type": "image",
+  "duration": "5 photos",
+  "photos": [
+    { "url": "https://cdn.example.com/1.jpg", "caption": "Schéma 1" },
+    { "url": "https://cdn.example.com/2.jpg", "caption": "Schéma 2" }
+  ]
+}
+
+### Ajouter une section — quiz
+POST {{baseUrl}}/modules/00000000-0000-0000-0000-000000000000/sections
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Quiz de fin de module",
+  "type": "quiz",
+  "duration": "1 évaluation",
+  "quiz": [
+    {
+      "question": "Quel principe favorise la modularité ?",
+      "options": ["Le couplage fort", "La séparation des responsabilités", "La duplication"],
+      "correctIndex": 1
+    }
+  ]
+}
+
+### Mettre à jour une section (le contenu traité selon son type)
+PATCH {{baseUrl}}/sections/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "body": "Contenu mis à jour" }
+
+### Supprimer une section
+DELETE {{baseUrl}}/sections/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+# ------------------------------------------------------------------
+# Progression (utilisateur connecté)
+# ------------------------------------------------------------------
+### S'inscrire à un cours (gratuit → immédiat ; payant → paiement requis)
+POST {{baseUrl}}/courses/00000000-0000-0000-0000-000000000000/enroll
+Authorization: Bearer {{token}}
+
+### Mes cours + progression
+GET {{baseUrl}}/users/me/courses
+Authorization: Bearer {{token}}
+
+### Marquer une section comme complétée
+POST {{baseUrl}}/sections/00000000-0000-0000-0000-000000000000/complete
+Authorization: Bearer {{token}}
+
+# ------------------------------------------------------------------
+# Paiements
+# ------------------------------------------------------------------
+### Initier un paiement (MOCK_PAYMENTS=true → confirmé immédiatement)
+POST {{baseUrl}}/payments/checkout
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "itemType": "course", "itemId": "00000000-0000-0000-0000-000000000000" }
+
+### Mes paiements
+GET {{baseUrl}}/payments/me
+Authorization: Bearer {{token}}
+
+### Webhook Naboopay (simulation). La signature = HMAC-SHA256 hex du corps brut
+### avec NABOOPAY_WEBHOOK_SECRET. En mode mock, l'en-tête peut être omis.
+POST {{baseUrl}}/payments/webhook
+Content-Type: application/json
+x-naboopay-signature: (hmac-sha256-hex-du-corps)
+
+{ "reference": "MRD-...", "status": "confirmed" }
+
+# ------------------------------------------------------------------
+# Accompagnement
+# ------------------------------------------------------------------
+### Créneaux de mentorat + offres
+GET {{baseUrl}}/mentoring/slots
+
+### Réserver un créneau
+POST {{baseUrl}}/mentoring/bookings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "durationMinutes": 30, "scheduledAt": "2026-10-15T15:00:00.000Z" }
+
+### Sessions Q&R à venir
+GET {{baseUrl}}/qa-sessions
+
+### S'inscrire à une session Q&R
+POST {{baseUrl}}/qa-sessions/00000000-0000-0000-0000-000000000000/register
+Authorization: Bearer {{token}}
+
+### Créer une session Q&R (admin)
+POST {{baseUrl}}/qa-sessions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "topic": "Révisions algorithmique",
+  "scheduledAt": "2026-11-01T17:00:00.000Z",
+  "durationMinutes": 60,
+  "maxSpots": 15
+}
+
+### Soumettre un travail à corriger
+POST {{baseUrl}}/work-submissions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "fileUrl": "https://files.example.com/devoir.pdf", "note": "Dissertation de droit constitutionnel" }
+
+# ------------------------------------------------------------------
+# Vitrine & contact
+# ------------------------------------------------------------------
+### Vitrine publique
+GET {{baseUrl}}/profile
+
+### Mettre à jour le profil (admin)
+PATCH {{baseUrl}}/profile
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "bio": "Nouvelle bio", "location": "Dakar, Sénégal" }
+
+### Ajouter une compétence (admin)
+POST {{baseUrl}}/profile/skills
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "category": "Informatique", "name": "Docker" }
+
+### Ajouter une réalisation (admin)
+POST {{baseUrl}}/profile/works
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "title": "Bot Discord open-source", "category": "Informatique", "description": "..." }
+
+### Formulaire de contact (public)
+POST {{baseUrl}}/contact
+Content-Type: application/json
+
+{ "name": "Recruteur X", "email": "rh@entreprise.com", "message": "Bonjour, votre profil nous intéresse." }
+
+# ------------------------------------------------------------------
+# Statistiques admin
+# ------------------------------------------------------------------
+### Tableau de bord
+GET {{baseUrl}}/admin/stats
+Authorization: Bearer {{token}}
+
+### Messages de contact
+GET {{baseUrl}}/admin/contact-messages
+Authorization: Bearer {{token}}
+
+### Marquer un message comme lu
+PATCH {{baseUrl}}/admin/contact-messages/00000000-0000-0000-0000-000000000000/read
+Authorization: Bearer {{token}}
