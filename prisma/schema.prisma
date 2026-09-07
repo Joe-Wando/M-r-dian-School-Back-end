@@ -1,0 +1,336 @@
+// Schéma Prisma — Plateforme Meredian
+// Traduction intégrale de architecture-technique.md (section 2).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------------------------------------------------
+// Enums
+// ------------------------------------------------------------------
+
+enum Role {
+  user
+  admin
+}
+
+enum CourseCategory {
+  Histoire
+  Droit
+  Informatique
+  RH
+}
+
+enum CourseLevel {
+  L1
+  L2
+  L3
+  FormationPro @map("Formation Pro")
+}
+
+enum CourseTemplate {
+  TheoriqueIllustre @map("Théorique illustré")
+  PratiqueGuidee    @map("Pratique guidée")
+  Mixte
+}
+
+enum SectionType {
+  reading
+  image
+  video
+  quiz
+}
+
+enum PaymentItemType {
+  course
+  mentoring
+  correction
+}
+
+enum PaymentStatus {
+  pending
+  confirmed
+  failed
+}
+
+enum MentoringStatus {
+  pending
+  confirmed
+  completed
+  cancelled
+}
+
+enum WorkSubmissionStatus {
+  pending
+  in_review
+  completed
+}
+
+// ------------------------------------------------------------------
+// 2.1 Utilisateurs et rôles
+// ------------------------------------------------------------------
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role     @default(user)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  enrollments        Enrollment[]
+  sectionCompletions SectionCompletion[]
+  payments           Payment[]
+  mentoringBookings  MentoringBooking[]
+  qaRegistrations    QaRegistration[]
+  workSubmissions    WorkSubmission[]
+
+  @@map("users")
+}
+
+// ------------------------------------------------------------------
+// 2.2 Cours, modules, sections
+// ------------------------------------------------------------------
+
+model Course {
+  id             String         @id @default(uuid()) @db.Uuid
+  code           String         @unique
+  title          String
+  category       CourseCategory
+  level          CourseLevel
+  template       CourseTemplate @default(Mixte)
+  isFree         Boolean        @default(false) @map("is_free")
+  price          Int            @default(0)
+  duration       String         @default("")
+  description    String         @default("")
+  pdfResourceUrl String?        @map("pdf_resource_url")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  modules     Module[]
+  enrollments Enrollment[]
+
+  @@index([category, level])
+  @@map("courses")
+}
+
+model Module {
+  id         String @id @default(uuid()) @db.Uuid
+  courseId   String @map("course_id") @db.Uuid
+  title      String
+  orderIndex Int    @default(0) @map("order_index")
+
+  course   Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  sections Section[]
+
+  @@index([courseId])
+  @@map("modules")
+}
+
+model Section {
+  id         String      @id @default(uuid()) @db.Uuid
+  moduleId   String      @map("module_id") @db.Uuid
+  title      String
+  type       SectionType
+  orderIndex Int         @default(0) @map("order_index")
+  duration   String      @default("")
+  practical  Boolean     @default(false)
+  body       String? // contenu si type = reading
+  videoUrl   String?     @map("video_url") // lien vidéo si type = video
+
+  module      Module              @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  photos      SectionPhoto[] // si type = image
+  quiz        QuizQuestion[] // si type = quiz
+  completions SectionCompletion[]
+
+  @@index([moduleId])
+  @@map("sections")
+}
+
+model SectionPhoto {
+  id         String @id @default(uuid()) @db.Uuid
+  sectionId  String @map("section_id") @db.Uuid
+  url        String
+  caption    String @default("")
+  orderIndex Int    @default(0) @map("order_index")
+
+  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId])
+  @@map("section_photos")
+}
+
+model QuizQuestion {
+  id           String @id @default(uuid()) @db.Uuid
+  sectionId    String @map("section_id") @db.Uuid
+  question     String
+  options      Json // tableau des choix
+  correctIndex Int    @map("correct_index")
+  orderIndex   Int    @default(0) @map("order_index")
+
+  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId])
+  @@map("quiz_questions")
+}
+
+// ------------------------------------------------------------------
+// 2.3 Suivi et progression
+// ------------------------------------------------------------------
+
+model Enrollment {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  courseId   String   @map("course_id") @db.Uuid
+  enrolledAt DateTime @default(now()) @map("enrolled_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@map("enrollments")
+}
+
+model SectionCompletion {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  sectionId   String   @map("section_id") @db.Uuid
+  completedAt DateTime @default(now()) @map("completed_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  section Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sectionId])
+  @@index([userId])
+  @@map("section_completions")
+}
+
+// ------------------------------------------------------------------
+// 2.4 Paiements
+// ------------------------------------------------------------------
+
+model Payment {
+  id                String          @id @default(uuid()) @db.Uuid
+  userId            String          @map("user_id") @db.Uuid
+  itemType          PaymentItemType @map("item_type")
+  itemId            String          @map("item_id") @db.Uuid
+  amount            Int
+  naboopayReference String?         @map("naboopay_reference")
+  status            PaymentStatus   @default(pending)
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([naboopayReference])
+  @@map("payments")
+}
+
+// ------------------------------------------------------------------
+// 2.5 Accompagnement personnel
+// ------------------------------------------------------------------
+
+model MentoringBooking {
+  id              String          @id @default(uuid()) @db.Uuid
+  userId          String          @map("user_id") @db.Uuid
+  durationMinutes Int             @map("duration_minutes")
+  price           Int
+  scheduledAt     DateTime        @map("scheduled_at")
+  meetingLink     String?         @map("meeting_link")
+  status          MentoringStatus @default(pending)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("mentoring_bookings")
+}
+
+model QaSession {
+  id              String   @id @default(uuid()) @db.Uuid
+  topic           String
+  scheduledAt     DateTime @map("scheduled_at")
+  durationMinutes Int      @map("duration_minutes")
+  maxSpots        Int      @map("max_spots")
+
+  registrations QaRegistration[]
+
+  @@map("qa_sessions")
+}
+
+model QaRegistration {
+  id        String @id @default(uuid()) @db.Uuid
+  sessionId String @map("session_id") @db.Uuid
+  userId    String @map("user_id") @db.Uuid
+
+  session QaSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, userId])
+  @@index([userId])
+  @@map("qa_registrations")
+}
+
+model WorkSubmission {
+  id        String               @id @default(uuid()) @db.Uuid
+  userId    String               @map("user_id") @db.Uuid
+  fileUrl   String               @map("file_url")
+  note      String               @default("")
+  status    WorkSubmissionStatus @default(pending)
+  price     Int                  @default(0)
+  createdAt DateTime             @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("work_submissions")
+}
+
+// ------------------------------------------------------------------
+// 2.6 Vitrine personnelle
+// ------------------------------------------------------------------
+
+model Profile {
+  id            String @id @default(uuid()) @db.Uuid
+  bio           String @default("")
+  cvUrl         String @default("") @map("cv_url")
+  pitchVideoUrl String @default("") @map("pitch_video_url")
+  location      String @default("")
+  emailContact  String @default("") @map("email_contact")
+
+  @@map("profile")
+}
+
+model Skill {
+  id       String @id @default(uuid()) @db.Uuid
+  category String
+  name     String
+
+  @@map("skills")
+}
+
+model Work {
+  id          String  @id @default(uuid()) @db.Uuid
+  title       String
+  category    String
+  description String  @default("")
+  link        String?
+
+  @@map("works")
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  email     String
+  message   String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("contact_messages")
+}
