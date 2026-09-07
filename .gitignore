@@ -1,0 +1,30 @@
+# Dépendances
+/node_modules
+
+# Build
+/dist
+/build
+
+# Environnement — ne jamais committer les secrets
+.env
+.env.local
+.env.*.local
+
+# Prisma (bases locales SQLite éventuelles)
+prisma/*.db
+prisma/*.db-journal
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Divers
+/coverage
+.DS_Store
+Thumbs.db
+.idea
+*.tsbuildinfo
