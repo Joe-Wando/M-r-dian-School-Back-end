@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import {
   AuthenticatedUser,
@@ -8,6 +9,8 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CreateWorkSubmissionDto } from './dto/create-work-submission.dto';
 import { WorkSubmissionsService } from './work-submissions.service';
 
+@ApiTags('Accompagnement')
+@ApiBearerAuth('jwt')
 @Controller('work-submissions')
 @UseGuards(JwtAuthGuard)
 export class WorkSubmissionsController {

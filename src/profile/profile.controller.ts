@@ -9,6 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -18,6 +19,7 @@ import { CreateSkillDto } from './dto/skill.dto';
 import { CreateWorkDto } from './dto/work.dto';
 import { ProfileService } from './profile.service';
 
+@ApiTags('Vitrine & contact')
 @Controller('profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
@@ -31,6 +33,7 @@ export class ProfileController {
   // --- Administration (rôle vérifié côté serveur) ---
 
   @Patch()
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   update(@Body() dto: UpdateProfileDto) {
@@ -38,6 +41,7 @@ export class ProfileController {
   }
 
   @Post('skills')
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   addSkill(@Body() dto: CreateSkillDto) {
@@ -45,6 +49,7 @@ export class ProfileController {
   }
 
   @Delete('skills/:id')
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   removeSkill(@Param('id', ParseUUIDPipe) id: string) {
@@ -52,6 +57,7 @@ export class ProfileController {
   }
 
   @Post('works')
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   addWork(@Body() dto: CreateWorkDto) {
@@ -59,6 +65,7 @@ export class ProfileController {
   }
 
   @Delete('works/:id')
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   removeWork(@Param('id', ParseUUIDPipe) id: string) {

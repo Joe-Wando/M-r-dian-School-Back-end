@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import {
   AuthenticatedUser,
@@ -8,6 +9,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { MentoringService } from './mentoring.service';
 
+@ApiTags('Accompagnement')
 @Controller('mentoring')
 export class MentoringController {
   constructor(private readonly mentoringService: MentoringService) {}
@@ -20,6 +22,7 @@ export class MentoringController {
 
   /** Réservation d'un créneau (utilisateur connecté). Le paiement se fait ensuite. */
   @Post('bookings')
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard)
   createBooking(
     @CurrentUser() user: AuthenticatedUser,

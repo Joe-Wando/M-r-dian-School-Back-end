@@ -7,6 +7,7 @@ import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { setupSwagger } from './swagger';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -28,7 +29,8 @@ async function bootstrap(): Promise<void> {
     credentials: true,
   });
 
-  app.setGlobalPrefix(config.get<string>('apiPrefix') ?? 'api');
+  const apiPrefix = config.get<string>('apiPrefix') ?? 'api';
+  app.setGlobalPrefix(apiPrefix);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -41,6 +43,9 @@ async function bootstrap(): Promise<void> {
 
   // Gestion d'erreurs centralisée : pas de fuite de stack trace en production.
   app.useGlobalFilters(new AllExceptionsFilter(isProd));
+
+  // Documentation OpenAPI : http://localhost:<port>/docs
+  setupSwagger(app, apiPrefix);
 
   app.enableShutdownHooks();
 

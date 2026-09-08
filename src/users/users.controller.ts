@@ -1,4 +1,5 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import {
   AuthenticatedUser,
@@ -7,6 +8,8 @@ import {
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { EnrollmentsService } from '../enrollments/enrollments.service';
 
+@ApiTags('Progression')
+@ApiBearerAuth('jwt')
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {

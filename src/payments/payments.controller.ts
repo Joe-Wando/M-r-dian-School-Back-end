@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { RawBodyRequest } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 
 import {
@@ -22,6 +23,7 @@ import { NaboopayWebhookDto } from './dto/naboopay-webhook.dto';
 import { NaboopayService } from './naboopay.service';
 import { PaymentsService } from './payments.service';
 
+@ApiTags('Paiements')
 @Controller('payments')
 export class PaymentsController {
   constructor(
@@ -31,6 +33,7 @@ export class PaymentsController {
 
   /** Initie un paiement Naboopay (cours, mentorat ou correction). */
   @Post('checkout')
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard)
   checkout(@CurrentUser() user: AuthenticatedUser, @Body() dto: CheckoutDto) {
     return this.paymentsService.checkout(user.id, dto);
@@ -38,6 +41,7 @@ export class PaymentsController {
 
   /** Historique des paiements de l'utilisateur connecté. */
   @Get('me')
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard)
   myPayments(@CurrentUser() user: AuthenticatedUser) {
     return this.paymentsService.listForUser(user.id);

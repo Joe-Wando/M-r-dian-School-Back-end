@@ -12,10 +12,14 @@ import {
   AuthenticatedUser,
   CurrentUser,
 } from '../common/decorators/current-user.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { EnrollmentsService } from './enrollments.service';
 
 /** Progression — routes réservées à l'utilisateur connecté. */
+@ApiTags('Progression')
+@ApiBearerAuth('jwt')
 @Controller()
 @UseGuards(JwtAuthGuard)
 export class EnrollmentsController {

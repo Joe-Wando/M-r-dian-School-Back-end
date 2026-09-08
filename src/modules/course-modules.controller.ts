@@ -8,6 +8,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -20,6 +21,8 @@ import { UpdateModuleDto } from './dto/update-module.dto';
  * Gestion des modules de cours — réservée aux administrateurs.
  * (Rôle vérifié côté serveur via JwtAuthGuard + RolesGuard.)
  */
+@ApiTags('Cours (admin)')
+@ApiBearerAuth('jwt')
 @Controller()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')

@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -17,50 +18,55 @@ import { QuizQuestionDto } from './quiz-question.dto';
 import { SectionPhotoDto } from './section-photo.dto';
 
 export class CreateSectionDto {
+  @ApiProperty({ example: 'Introduction au sujet', minLength: 2, maxLength: 200 })
   @IsString()
   @MinLength(2)
   @MaxLength(200)
   title!: string;
 
+  @ApiProperty({ enum: SectionType, enumName: 'SectionType' })
   @IsEnum(SectionType, {
     message: 'type doit valoir reading, image, video ou quiz.',
   })
   type!: SectionType;
 
+  @ApiPropertyOptional({ example: 0 })
   @IsOptional()
   @IsInt()
   @Min(0)
   orderIndex?: number;
 
+  @ApiPropertyOptional({ example: '12 min' })
   @IsOptional()
   @IsString()
   @MaxLength(40)
   duration?: string;
 
+  @ApiPropertyOptional({ description: 'Vidéo pratique obligatoire (parties code)' })
   @IsOptional()
   @IsBoolean()
   practical?: boolean;
 
-  // type = reading
+  @ApiPropertyOptional({ description: 'Contenu markdown — type = reading', maxLength: 50000 })
   @IsOptional()
   @IsString()
   @MaxLength(50_000)
   body?: string;
 
-  // type = video
+  @ApiPropertyOptional({ description: 'Lien de la vidéo hébergée — type = video', maxLength: 2000 })
   @IsOptional()
   @IsString()
   @MaxLength(2000)
   videoUrl?: string;
 
-  // type = image
+  @ApiPropertyOptional({ type: [SectionPhotoDto], description: 'Galerie — type = image' })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => SectionPhotoDto)
   photos?: SectionPhotoDto[];
 
-  // type = quiz
+  @ApiPropertyOptional({ type: [QuizQuestionDto], description: 'Questions — type = quiz' })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
