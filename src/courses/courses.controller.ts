@@ -10,6 +10,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import {
   AuthenticatedUser,
@@ -24,6 +25,7 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { QueryCoursesDto } from './dto/query-courses.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 
+@ApiTags('Catalogue')
 @Controller('courses')
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
@@ -52,6 +54,8 @@ export class CoursesController {
   // --- Gestion admin (rôle vérifié côté serveur) ---
 
   @Post()
+  @ApiTags('Cours (admin)')
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   create(@Body() dto: CreateCourseDto) {
@@ -59,6 +63,8 @@ export class CoursesController {
   }
 
   @Patch(':id')
+  @ApiTags('Cours (admin)')
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateCourseDto) {
@@ -66,6 +72,8 @@ export class CoursesController {
   }
 
   @Delete(':id')
+  @ApiTags('Cours (admin)')
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   remove(@Param('id', ParseUUIDPipe) id: string) {

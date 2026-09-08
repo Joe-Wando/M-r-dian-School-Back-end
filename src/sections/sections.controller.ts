@@ -8,6 +8,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { Roles } from '../common/decorators/roles.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -19,6 +20,8 @@ import { SectionsService } from './sections.service';
 /**
  * Gestion des sections de cours — réservée aux administrateurs.
  */
+@ApiTags('Cours (admin)')
+@ApiBearerAuth('jwt')
 @Controller()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')

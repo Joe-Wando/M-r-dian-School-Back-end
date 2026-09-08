@@ -9,6 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import {
   AuthenticatedUser,
@@ -20,6 +21,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { CreateQaSessionDto } from './dto/create-qa-session.dto';
 import { QaSessionsService } from './qa-sessions.service';
 
+@ApiTags('Accompagnement')
 @Controller('qa-sessions')
 export class QaSessionsController {
   constructor(private readonly qaSessionsService: QaSessionsService) {}
@@ -33,6 +35,7 @@ export class QaSessionsController {
   /** Inscription à une session (utilisateur connecté). */
   @Post(':id/register')
   @HttpCode(HttpStatus.CREATED)
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard)
   register(
     @CurrentUser() user: AuthenticatedUser,
@@ -43,6 +46,8 @@ export class QaSessionsController {
 
   /** Création d'une session (admin — hors liste initiale, ajouté pour la gestion). */
   @Post()
+  @ApiTags('Admin')
+  @ApiBearerAuth('jwt')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   create(@Body() dto: CreateQaSessionDto) {

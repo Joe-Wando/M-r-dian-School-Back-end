@@ -107,8 +107,14 @@ npm run build && npm run start:prod   # build puis exécution de dist/
 
 Vérification rapide : `GET http://localhost:4000/api/health`
 
+**Documentation d'API interactive (Swagger / OpenAPI) :**
+
+- UI : `http://localhost:4000/docs` — bouton *Authorize* pour coller le JWT
+  renvoyé par `POST /api/auth/login`
+- Spec JSON : `http://localhost:4000/docs-json`
+
 Le fichier [`requests.http`](./requests.http) (extension VS Code *REST Client*)
-contient une requête par endpoint, prête à l'emploi.
+contient aussi une requête par endpoint, prête à l'emploi.
 
 ---
 
@@ -166,6 +172,7 @@ disponibles. La structure complète est néanmoins en place :
 ```
 src/
   main.ts                 amorçage (ValidationPipe global, helmet, filtres, prefix)
+  swagger.ts              doc OpenAPI (/docs, /docs-json)
   app.module.ts           module racine
   config/                 configuration + validation des variables d'env
   prisma/                 PrismaModule + PrismaService (global)
