@@ -1,7 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { UpdateBookingDto } from './dto/update-booking.dto';
 import { getMentoringOption, MENTORING_OPTIONS } from './mentoring.constants';
 
 const SLOT_HOURS = [10, 15, 18]; // heures proposées (UTC) sur 14 jours ouvrés
@@ -56,6 +57,26 @@ export class MentoringService {
         'Réservation créée en attente de paiement. Appelez POST /payments/checkout ' +
         `avec { "itemType": "mentoring", "itemId": "${booking.id}" }.`,
     };
+  }
+
+  async listAllForAdmin() {
+    return this.prisma.mentoringBooking.findMany({
+      include: { user: { select: { id: true, name: true, email: true } } },
+      orderBy: { scheduledAt: 'asc' },
+    });
+  }
+
+  async updateBooking(id: string, dto: UpdateBookingDto) {
+    const booking = await this.prisma.mentoringBooking.findUnique({ where: { id } });
+    if (!booking) throw new NotFoundException('Réservation introuvable.');
+
+    return this.prisma.mentoringBooking.update({
+      where: { id },
+      data: {
+        ...(dto.status != null && { status: dto.status }),
+        ...(dto.meetingLink != null && { meetingLink: dto.meetingLink }),
+      },
+    });
   }
 
   /** Renvoie jusqu'à `limit` créneaux futurs libres (jours ouvrés, SLOT_HOURS). */

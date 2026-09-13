@@ -22,6 +22,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Fichiers déposés par les utilisateurs (stockage local en dev)
+/uploads
+
 # Divers
 /coverage
 .DS_Store

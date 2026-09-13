@@ -277,13 +277,18 @@ model QaRegistration {
 }
 
 model WorkSubmission {
-  id        String               @id @default(uuid()) @db.Uuid
-  userId    String               @map("user_id") @db.Uuid
-  fileUrl   String               @map("file_url")
-  note      String               @default("")
-  status    WorkSubmissionStatus @default(pending)
-  price     Int                  @default(0)
-  createdAt DateTime             @default(now()) @map("created_at")
+  id                       String               @id @default(uuid()) @db.Uuid
+  userId                   String               @map("user_id") @db.Uuid
+  originalFileName         String               @map("original_file_name")
+  storedFileName           String               @map("stored_file_name")
+  note                     String               @default("")
+  status                   WorkSubmissionStatus @default(pending)
+  price                    Int                  @default(0)
+  feedback                 String?
+  feedbackOriginalFileName String?              @map("feedback_original_file_name")
+  feedbackStoredFileName   String?              @map("feedback_stored_file_name")
+  reviewedAt               DateTime?            @map("reviewed_at")
+  createdAt                DateTime             @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
